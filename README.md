@@ -1,0 +1,206 @@
+# 使用教程
+
+Vinson Sheep
+
+2021.10.11
+
+*如果需要添加功能，可以直接联系我，或者issue该项目*
+
+## 1. 总览
+
+该包提供了地面站和N3/A3飞控无人机之间利用数传电台通讯的ROS接口，这使得地面站能够实时地获取无人机的状态或位置信息，并且发送控制指令，而无需思考串口通信的具体实现。
+
+>1. 该包假设地面站和无人机之间的通信是畅通的，不存在链路断开的情况
+>
+>2. 无人机编号默认从1开始
+>
+>3. ubuntu 18.04, ros melodic, A3/N3飞控
+>
+>4. 地面站带宽默认为5KB， 无人机端带宽默认为2KB，如果想增加带宽，请修改源码频率
+
+#### 地面站/无人机 依赖安装
+
+```
+sudo apt install ros-melodic-serial
+```
+
+该包同样依赖dji_sdk，请务必提前安装好。
+
+#### 固定串口ID （如果不需要请忽略）
+
+[参考地址](https://blog.csdn.net/sunkman/article/details/118196128)
+
+开发包中的默认端口号为`/dev/usb_radio`或者`/dev/usb_n3`。喜欢用`/dev/ttyUSB0`之类的端口可以修改对应launch文件。
+
+#### 地面站：
+
+```
+roslaunch radio_proxy station_proxy
+```
+
+#### 无人机：
+
+修改配置文件
+
+```
+sudo gedit ~/.bashrc
+```
+
+在末尾添加
+
+```
+export dji_id=<无人机id>
+```
+
+新建终端
+
+```
+roslaunch radio_proxy dji_proxy
+```
+
+
+
+## 2. 结点
+
+### 2.1 station_proxy
+
+地面站通信代理
+
+#### 2.1.1 Subscribed Topics
+
+**/station_proxy/command (radio_proxy/Command)**
+
+| 命令           | 数值 | 描述          |
+| -------------- | ---- | ------------- |
+| SETPOINT_GPS   | 101  | GPS定点飞行   |
+| SETPOINT_LOCAL | 102  | LOCAL定点飞行 |
+| TAKEOFF        | 103  | 起飞          |
+| LAND           | 104  | 降落          |
+| ARM            | 105  | 解锁          |
+| DISARM         | 106  | 上锁          |
+| HOLD           | 107  | 悬停          |
+
+#### 2.1.2 Published Topics
+
+**/dji_{id}/status (radio_proxy/Status)**
+
+用于描述第id架飞机的状态。
+
+**/dji_{id}/flight_data (radio_proxy/FlightData)**
+
+用于描述第id架飞机的飞行数据。
+
+**/dji_{id}/message (std_msg/String)**
+
+第id架飞机回传回来的消息。
+
+#### 2.1.3 Services
+
+#### 2.1.4 Services used
+
+#### 2.1.5 Parameters
+
+**~/station_proxy/uav_num (int, default: 1)**
+
+飞机数目，默认为1台，最多支持8台设备。
+
+**~/station_proxy/serial_port (string, default: /dev/ttyUSB0)**
+
+串口地址，可以在/dev目录下查询。
+
+**~/station_proxy/baud_rate (int, default: 230400)**
+
+波特率，与数传电台自身配置有关。
+
+
+
+### 2.2 dji_proxy
+
+无人机通信代理
+
+#### 2.2.1 Subscribed Topics
+
+1. dji_sdk接口 [官网地址](http://wiki.ros.org/dji_sdk/)
+
+**/dji_sdk/acceleration_ground_fused ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
+
+Fused acceleration with respect to East-North-Up (ENU) ground frame, published at 100 Hz. This topic is unavailable on M100. Use imu topic for raw acceleration.
+
+**/dji_sdk/angular_velocity_fused ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
+
+Fused angular rate (p,q,r) around Forward-Left-Up (FLU) body frame, published at 100 Hz. This topic is unavailable on M100. Use imu topic for raw rate.
+
+**/dji_sdk/attitude ([geometry_msgs/QuaternionStamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/QuaternionStamped.html)) **
+
+Vehicle attitude represented as quaternion for the rotation from FLU body frame to ENU ground frame, published at 100 Hz. 
+
+**/dji_sdk/battery_state ([sensor_msgs/BatteryState](http://docs.ros.org/en/api/sensor_msgs/html/msg/BatteryState.html)) **
+
+Report the current battery voltage at 10 Hz.
+
+**/dji_sdk/display_mode ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
+
+Display mode is the detailed status of the drone. All supported status are listed in dji_sdk.h. Published at 50 Hz. This topic is unavailable on M100. 
+
+**/dji_sdk/flight_status ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
+
+Simple status of the vehicle published at 50 Hz, detailed status are  listed in dji_sdk.h. Note that status for M100 and A3/N3 are different. 
+
+**/dji_sdk/gps_health ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
+
+GPS signal health is between 0 and 5, 5 is the best condition. Use  gps_position for control only if gps_health >= 3. Published at 50 Hz. 
+
+**/dji_sdk/gps_position ([sensor_msgs/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)) **
+
+Fused global position of the vehicle in latitude, longitude and  altitude(m). Position in WGS 84 reference ellipsoid, published at 50 Hz. If no gps present, default publishes longitude and latitude equal  zeros. 
+
+**/dji_sdk/velocity ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
+
+Velocity in ENU ground frame, published at 50 Hz. The velocity is valid only when gps_health >= 3. 
+
+**/dji_sdk/height_above_takeoff ([std_msgs/Float32](http://docs.ros.org/en/api/std_msgs/html/msg/Float32.html)) **
+
+Height above takeoff location. It is only valid after drone is armed, when the flight controller has a reference altitude set. 
+
+**/dji_sdk/local_position ([geometry_msgs/PointStamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/PointStamped.html)) **
+
+Local position in Cartesian ENU frame, of which the origin is set by the user by calling the /dji_sdk/set_local_pos_ref service. Note that the  local position is calculated from GPS position, so good GPS health is needed for the local position to be useful. 
+
+2. 结点接口
+
+**/dji_proxy/message (std_msg/String)**
+
+回传的消息，用于地面站打印。无需编写类`dji_1:`开头，地面站会针对不同的飞机提供不同的`topic`。为了代码的正常使用，请不要过分依赖该接口，务必作为偶然的信息回传接口。
+
+
+
+#### 2.2.2 Published Topics
+
+**/dji_proxy/leader/flight_data (radio_proxy/FlightData)**
+
+如果id为1，代表本机为leader，不会发送该消息。只有从机才能收到该话题。（debug情况下leader同样会收到）
+
+**/dji_proxy/command (radio_proxy/Command)**
+
+来自地面站的命令信息。详情可见2.1.1。
+
+#### 2.2.3 Services
+
+#### 2.2.4 Services used
+
+#### 2.2.5 Parameters
+
+**~/dji_proxy/id (int, default: 1)**
+
+无人机ID，从1开始编号。
+
+**~/dji_proxy/serial_port (string, default: /dev/ttyUSB0)**
+
+串口地址，可以在/dev目录下查询。
+
+**~/dji_proxy/baud_rate (int, default: 230400)**
+
+波特率，与数传电台自身配置有关。
+
+
+
