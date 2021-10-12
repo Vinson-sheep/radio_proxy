@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="radio_proxy" type="distance_test" name="distance_test" output="screen">
+        <param name="uav_num" value="3" />
+    </node>
+</launch>

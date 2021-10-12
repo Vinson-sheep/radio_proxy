@@ -143,7 +143,8 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(dji_proxy src/dji_proxy.cpp)
 add_executable(station_proxy src/station_proxy.cpp)
-add_executable(debug_node src/debug_node.cpp)
+add_executable(debug_node test/debug_node.cpp)
+add_executable(distance_test test/distance_test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,6 +157,7 @@ add_executable(debug_node src/debug_node.cpp)
 add_dependencies(dji_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(station_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(debug_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(distance_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(dji_proxy
@@ -165,6 +167,9 @@ target_link_libraries(station_proxy
   ${catkin_LIBRARIES}
 )
 target_link_libraries(debug_node
+${catkin_LIBRARIES}
+)
+target_link_libraries(distance_test
 ${catkin_LIBRARIES}
 )
 
