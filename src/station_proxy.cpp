@@ -50,7 +50,7 @@ station_proxy::station_proxy()
     }
 
     // subscriber
-    _cmdSub = private_nh.subscribe<radio_proxy::Command>("Command", 2, &station_proxy::cmdCB, this);
+    _cmdSub = private_nh.subscribe<radio_proxy::Command>("command", 2, &station_proxy::cmdCB, this);
 
     // timer
     _serialLoopTimer = nh.createTimer(ros::Duration(0.0002), &station_proxy::serialLoopCB, this);

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(radio_proxy)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -111,7 +111,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
  LIBRARIES radio_proxy
  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs serial std_msgs tf message_runtime
 #  DEPENDS system_lib
@@ -129,9 +129,10 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/radio_proxy.cpp
-# )
+add_library(radio_proxy
+  include/radio_proxy/radio_proxy.h
+  src/radio_proxy.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -154,12 +155,16 @@ add_executable(distance_test test/distance_test.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+add_dependencies(radio_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(dji_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(station_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(debug_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(distance_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(radio_proxy
+  ${catkin_LIBRARIES}
+)
 target_link_libraries(dji_proxy
   ${catkin_LIBRARIES}
 )
