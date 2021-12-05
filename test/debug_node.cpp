@@ -59,8 +59,8 @@ int main(int argc, char** argv)
         buffer[2] = 2;
         buffer[3] = 3;
 
-        dji::MSG_1 msg_1;
-        dji::MSG_2 msg_2;
+        px4::MSG_1 msg_1;
+        px4::MSG_2 msg_2;
 
         memcpy(buffer+4, &msg_1, sizeof(msg_1));
         

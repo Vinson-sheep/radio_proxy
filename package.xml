@@ -69,9 +69,9 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>tf</exec_depend>
   <exec_depend>message_runtime</exec_depend>
-  <build_depend>dji_sdk</build_depend>
-  <build_export_depend>dji_sdk</build_export_depend>
-  <exec_depend>dji_sdk</exec_depend>
+  <build_depend>mavros_msgs</build_depend>
+  <build_export_depend>mavros_msgs</build_export_depend>
+  <exec_depend>mavros_msgs</exec_depend>
 
 
 

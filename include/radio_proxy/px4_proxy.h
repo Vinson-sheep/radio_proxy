@@ -1,54 +1,50 @@
-///@file dji_proxy.h
+///@file px4_proxy.h
 ///@author Vinson Sheep (775014077@qq.com)
 ///@brief 
 ///@version 1.0
-///@date 2021-10-11
+///@date 2021-12-05
 ///
 ///@copyright Copyright (c) 2021
 ///
-#ifndef DJI_PROXY_
-#define DJI_PROXY
+#ifndef PX4_PROXY_
+#define PX4_PROXY_
 
 #include "ros/ros.h"
 #include "serial/serial.h"
 #include <iostream>
+#include <algorithm>
 
 #include "std_msgs/String.h"
 #include "geometry_msgs/Vector3Stamped.h"
 #include "geometry_msgs/QuaternionStamped.h"
-#include "sensor_msgs/BatteryState.h"
 #include "std_msgs/UInt8.h"
-#include "sensor_msgs/NavSatFix.h"
 #include "std_msgs/Float32.h"
 #include "geometry_msgs/PointStamped.h"
-#include "tf/transform_datatypes.h"
+#include "tf2/utils.h"
+
+#include "mavros_msgs/State.h"
+#include "geometry_msgs/TwistStamped.h"
+#include "geometry_msgs/PoseStamped.h"
+#include "mavros_msgs/BatteryStatus.h"
 
 #include "radio_proxy/data_type.h"
-
 #include "radio_proxy/FlightData.h"
 #include "radio_proxy/Command.h"
 
-namespace dji{
+namespace px4{
 
 
-class dji_proxy
+class px4_proxy
 {
 private:
 	// serial port
 	serial::Serial _sp;
 
 	// subscriber
-	ros::Subscriber _accSub;
-	ros::Subscriber _angVelSub;
-	ros::Subscriber _altSub;
-	ros::Subscriber _batStaSub;
-	ros::Subscriber _disMoSub;
-	ros::Subscriber _fliStaSub;
-	ros::Subscriber _gpsHeaSub;
-	ros::Subscriber _gpsPosSub;
+	ros::Subscriber _stateSub;
 	ros::Subscriber _velSub;
-	ros::Subscriber _heightSub;
-	ros::Subscriber _localPosSub;
+	ros::Subscriber _localPoseSub;
+	ros::Subscriber _batStaSub;
 
 	ros::Subscriber _msgSub;
 
@@ -57,7 +53,7 @@ private:
 	MSG_2 _msg_2;
 
 	// publisher
-	ros::Publisher _leaderGpsPub;
+	ros::Publisher _leaderFdPub;
 	ros::Publisher _cmdPub;
 	
 	// constant
@@ -88,23 +84,16 @@ private:
 	void resentFlightDataCB(const ros::TimerEvent &event);
 	void resentStatusCB(const ros::TimerEvent &event);
 
-	void accCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p);
-	void angVelCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p);
-	void altCB(const geometry_msgs::QuaternionStamped::ConstPtr &msg_p);
-	void batStaSub(const sensor_msgs::BatteryState::ConstPtr &msg_p);
-	void disMoCB(const std_msgs::UInt8::ConstPtr &msg_p);
-	void fliStaCB(const std_msgs::UInt8::ConstPtr &msg_p);
-	void gpsHeaCB(const std_msgs::UInt8::ConstPtr &msg_p);
-	void gpsPosCB(const sensor_msgs::NavSatFix::ConstPtr &msg_p);
-	void velCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p);
-	void heightCB(const std_msgs::Float32::ConstPtr &msg_p);
-	void localPosCB(const geometry_msgs::PointStamped::ConstPtr &msg_p);
+    void stateCB(const mavros_msgs::State::ConstPtr &msg_p);
+	void velCB(const geometry_msgs::TwistStamped::ConstPtr &msg_p);
+	void localPoseCB(const geometry_msgs::PoseStamped::ConstPtr &msg_p);
+	void batStaSub(const mavros_msgs::BatteryStatus::ConstPtr &msg_p);
 
 	void msgCB(const std_msgs::String::ConstPtr &msg_p);
 
 public:
-	dji_proxy();
-	~dji_proxy();
+	px4_proxy();
+	~px4_proxy();
 };
 
 

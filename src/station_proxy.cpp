@@ -1,6 +1,6 @@
 #include "radio_proxy/station_proxy.h"
 
-namespace dji{
+namespace px4{
 
 station_proxy::station_proxy()
 {
@@ -40,9 +40,9 @@ station_proxy::station_proxy()
         std::stringstream ss_s;
         std::stringstream ss_f;
         std::stringstream ss_m;
-        ss_s << "/dji_" << i << "/status";
-        ss_f << "/dji_" << i << "/flight_data";
-        ss_m << "/dji_" << i << "/message";
+        ss_s << "/px4_" << i << "/status";
+        ss_f << "/px4_" << i << "/flight_data";
+        ss_m << "/px4_" << i << "/message";
 
         _statusPub[i] = nh.advertise<radio_proxy::Status>(ss_s.str().c_str(), 1);
         _flightDataPub[i] = nh.advertise<radio_proxy::FlightData>(ss_f.str().c_str(), 1);
@@ -145,9 +145,6 @@ void station_proxy::mainLoopCB(const ros::TimerEvent &event){
                 fd.id = local_id;
 
                 // copy data
-                fd.latitude = msg_1.latitude;
-                fd.longitude = msg_1.longitude;
-                fd.altitude = msg_1.altitude;
                 fd.x = msg_1.x;
                 fd.y = msg_1.y;
                 fd.z = msg_1.z;
@@ -161,7 +158,6 @@ void station_proxy::mainLoopCB(const ros::TimerEvent &event){
                 fd.roll = msg_1.roll;
                 fd.yaw = msg_1.yaw;
                 fd.yaw_rate = msg_1.yaw_rate;
-                fd.height_above_takeoff = msg_1.height_above_takeoff;
 
                 // publish
                 _flightDataPub[local_id].publish(fd);
@@ -184,11 +180,10 @@ void station_proxy::mainLoopCB(const ros::TimerEvent &event){
 
                 // copy data
                 st.battery_v = msg_2.battery_v;
-                st.display_mode = msg_2.display_mode;
-                st.flight_status = msg_2.flight_status;
-                st.gps_health = msg_2.gps_health;
-                st.arm_state = msg_2.arm_state;
-                st.land_state = msg_2.land_state;
+                st.connected = msg_2.connected == 0 ? false: true;
+                st.armed = msg_2.armed == 0 ? false: true;
+                st.manual_input = msg_2.manual_input == 0 ? false: true;
+                st.mode = msg_2.mode;
 
                 // publish
                 _statusPub[local_id].publish(st);
@@ -274,7 +269,7 @@ void station_proxy::cmdCB(const radio_proxy::Command::ConstPtr &msg_p){
 
 }
 
-} // end namespace dji
+} // end namespace px4
 
 
 
@@ -287,7 +282,7 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh;
     ros::NodeHandle private_nh("~");
 
-    dji::station_proxy proxy;
+    px4::station_proxy proxy;
 
     ros::spin();
 

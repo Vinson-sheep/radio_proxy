@@ -22,7 +22,7 @@
 #include "radio_proxy/Command.h"
 #include "radio_proxy/Status.h"
 
-namespace dji{
+namespace px4{
 
 
 class station_proxy

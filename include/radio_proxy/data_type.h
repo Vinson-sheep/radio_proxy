@@ -12,14 +12,11 @@
 
 #include "ros/ros.h"
 
-namespace dji{
+namespace px4{
 
 ///@brief flight data
 ///
 typedef struct MSG_1{
-    float_t latitude;
-    float_t longitude;
-    float_t altitude;
     float_t x;
     float_t y;
     float_t z;
@@ -33,37 +30,32 @@ typedef struct MSG_1{
     float_t roll;
     float_t yaw;
     float_t yaw_rate;
-    float_t height_above_takeoff;
 
     MSG_1(){
-        this->latitude = this->longitude = this->altitude = 0;
         this->x = this->y = this->z = 0;
         this->vx = this->vy = this->vz = 0;
         this->ax = this->ay = this->az = 0;
         this->pitch = this->roll = this->yaw = this->yaw_rate = 0;
-        this->height_above_takeoff = 0;
     }
 } MSG_1;
 
-///@brief dji status
+///@brief uav status
 ///
 typedef struct MSG_2{
     float_t battery_v;
-    uint8_t display_mode;
-    uint8_t flight_status;
-    uint8_t gps_health;
-    uint8_t arm_state;
-    uint8_t land_state;
+    uint8_t connected;
+    uint8_t armed;
+    uint8_t manual_input;
+    char mode[16];
 
     MSG_2(){
         this->battery_v = 0;
-        this->display_mode = this->flight_status = 0;
-        this->gps_health = 0;
-        this->arm_state = this->land_state = 0;
+        this->connected = this->armed = this->manual_input = 0;
+        this->mode[0] = '\0';
     }
 } MSG_2;
 
-///@brief setpoint GPS
+///@brief setpoint GPS (保留)
 ///
 typedef struct MSG_101{
     float_t latitude;

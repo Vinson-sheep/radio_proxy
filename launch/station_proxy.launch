@@ -1,7 +1,8 @@
 <launch>
     <node pkg="radio_proxy" type="station_proxy" name="station_proxy" output="screen">
-        <param name="uav_num" value="3" />
-        <param name="port" value="/dev/usb_radio" />
+        <param name="uav_num" value="1" />
+        <!-- <param name="port" value="/dev/usb_radio" /> -->
+        <param name="port" value="/dev/ttyUSB0" />
         <param name="baud_rate" value="230400" />
     </node>
 </launch>

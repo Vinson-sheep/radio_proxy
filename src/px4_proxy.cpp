@@ -1,8 +1,8 @@
-#include "radio_proxy/dji_proxy.h"
+#include "radio_proxy/px4_proxy.h"
 
-namespace dji{
+namespace px4{
 
-dji_proxy::dji_proxy(){
+px4_proxy::px4_proxy(){
 
     ros::NodeHandle nh;
     ros::NodeHandle private_nh("~");
@@ -35,30 +35,24 @@ dji_proxy::dji_proxy(){
     } 
 
     // publisher
-    _leaderGpsPub = private_nh.advertise<radio_proxy::FlightData>("leader/flight_data", 1);
+    _leaderFdPub = private_nh.advertise<radio_proxy::FlightData>("leader/flight_data", 1);
     _cmdPub = private_nh.advertise<radio_proxy::Command>("command", 1);
 
     // subscriber
-    _accSub = nh.subscribe<geometry_msgs::Vector3Stamped>("/dji_sdk/acceleration_ground_fused", 2, &dji_proxy::accCB, this);
-	_angVelSub = nh.subscribe<geometry_msgs::Vector3Stamped>("/dji_sdk/angular_velocity_fused", 2, &dji_proxy::angVelCB, this);
-	_altSub = nh.subscribe<geometry_msgs::QuaternionStamped>("/dji_sdk/attitude", 2, &dji_proxy::altCB, this);
-	_batStaSub = nh.subscribe<sensor_msgs::BatteryState>("/dji_sdk/battery_state", 2, &dji_proxy::batStaSub, this);
-	_disMoSub = nh.subscribe<std_msgs::UInt8>("/dji_sdk/display_mode", 2, &dji_proxy::disMoCB, this);
-	_fliStaSub = nh.subscribe<std_msgs::UInt8>("/dji_sdk/flight_status", 2, &dji_proxy::fliStaCB, this);
-	_gpsHeaSub = nh.subscribe<std_msgs::UInt8>("/dji_sdk/gps_health", 2, &dji_proxy::gpsHeaCB, this);
-	_gpsPosSub = nh.subscribe<sensor_msgs::NavSatFix>("/dji_sdk/gps_position", 2, &dji_proxy::gpsPosCB, this);
-	_velSub = nh.subscribe<geometry_msgs::Vector3Stamped>("/dji_sdk/velocity", 2, &dji_proxy::velCB, this);
-	_heightSub = nh.subscribe<std_msgs::Float32>("/dji_sdk/height_above_takeoff", 2, &dji_proxy::heightCB, this);
-	_localPosSub = nh.subscribe<geometry_msgs::PointStamped>("/dji_sdk/local_position", 2, &dji_proxy::localPosCB, this);
+    _stateSub = nh.subscribe<>("/mavros/state", 2, &px4_proxy::stateCB, this);
+	_velSub = nh.subscribe<geometry_msgs::TwistStamped>("/mavros/local_position/velocity_local", 2, &px4_proxy::velCB, this);
+	_localPoseSub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 2, &px4_proxy::localPoseCB, this);
+	_batStaSub = nh.subscribe<mavros_msgs::BatteryStatus>("/mavros/battery", 2, &px4_proxy::batStaSub, this);
 
-	_msgSub = private_nh.subscribe<std_msgs::String>("message", 2, &dji_proxy::msgCB, this);
+
+	_msgSub = private_nh.subscribe<std_msgs::String>("message", 2, &px4_proxy::msgCB, this);
 
 
     // timer
-    _serialLoopTimer = nh.createTimer(ros::Duration(0.0005), &dji_proxy::serialLoopCB, this);
-    _mainLoopTimer = nh.createTimer(ros::Duration(0.005), &dji_proxy::mainLoopCB, this);
-    _resendFlightDataTimer = nh.createTimer(ros::Duration(0.1), &dji_proxy::resentFlightDataCB, this);
-    _resendStatusTimer = nh.createTimer(ros::Duration(1), &dji_proxy::resentStatusCB, this);
+    _serialLoopTimer = nh.createTimer(ros::Duration(0.0005), &px4_proxy::serialLoopCB, this);
+    _mainLoopTimer = nh.createTimer(ros::Duration(0.005), &px4_proxy::mainLoopCB, this);
+    _resendFlightDataTimer = nh.createTimer(ros::Duration(0.1), &px4_proxy::resentFlightDataCB, this);
+    _resendStatusTimer = nh.createTimer(ros::Duration(1), &px4_proxy::resentStatusCB, this);
 
     // buffer
     for (int i=0; i<2; i++){
@@ -71,14 +65,14 @@ dji_proxy::dji_proxy(){
 
 }
 
-dji_proxy::~dji_proxy(){
+px4_proxy::~px4_proxy(){
     _sp.close();
 }
 
 ///@brief get one byte from serial and store in proper buffer
 ///
 ///@param event 
-void dji_proxy::serialLoopCB(const ros::TimerEvent &event){
+void px4_proxy::serialLoopCB(const ros::TimerEvent &event){
     // read serial data and store
     if (_sp.available()==0){
         return;
@@ -115,7 +109,7 @@ void dji_proxy::serialLoopCB(const ros::TimerEvent &event){
 ///@brief get command and send by serial
 ///
 ///@param msg_p 
-void dji_proxy::mainLoopCB(const ros::TimerEvent &event){
+void px4_proxy::mainLoopCB(const ros::TimerEvent &event){
     for (int i=0; i<2; i++){
         if (_buffer_available[i] == true){
             // copy data and release buffer
@@ -139,9 +133,6 @@ void dji_proxy::mainLoopCB(const ros::TimerEvent &event){
                 fd.id = local_id;
                 
                 // copy data
-                fd.latitude = msg_1.latitude;
-                fd.longitude = msg_1.longitude;
-                fd.altitude = msg_1.altitude;
                 fd.x = msg_1.x;
                 fd.y = msg_1.y;
                 fd.z = msg_1.z;
@@ -155,10 +146,9 @@ void dji_proxy::mainLoopCB(const ros::TimerEvent &event){
                 fd.roll = msg_1.roll;
                 fd.yaw = msg_1.yaw;
                 fd.yaw_rate = msg_1.yaw_rate;
-                fd.height_above_takeoff = msg_1.height_above_takeoff;
 
                 // publish
-                _leaderGpsPub.publish(fd);
+                _leaderFdPub.publish(fd);
             }
             else if (local_id == 254 && msg_id >= 101 && msg_id <= 107 
                         && (target_id == _id || target_id == 255)){ // command from station
@@ -214,7 +204,7 @@ void dji_proxy::mainLoopCB(const ros::TimerEvent &event){
 ///@brief send flight data of this vechile to station
 ///
 ///@param event 
-void dji_proxy::resentFlightDataCB(const ros::TimerEvent &event){
+void px4_proxy::resentFlightDataCB(const ros::TimerEvent &event){
 
     // header
     _buffer_write[0] = 0X5A;
@@ -242,7 +232,7 @@ void dji_proxy::resentFlightDataCB(const ros::TimerEvent &event){
 ///@brief send status of this vechile to station
 ///
 ///@param event 
-void dji_proxy::resentStatusCB(const ros::TimerEvent &event){
+void px4_proxy::resentStatusCB(const ros::TimerEvent &event){
 
     // header
     _buffer_write[0] = 0X5A;
@@ -262,72 +252,51 @@ void dji_proxy::resentStatusCB(const ros::TimerEvent &event){
 
 }
 
+void px4_proxy::stateCB(const mavros_msgs::State::ConstPtr &msg_p){
+    _msg_2.connected = msg_p->connected;
+    _msg_2.armed = msg_p->armed;
+    _msg_2.manual_input = msg_p->manual_input;
 
-void dji_proxy::accCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    _msg_1.ax = msg_p->vector.x;
-    _msg_1.ay = msg_p->vector.y;
-    _msg_1.az = msg_p->vector.z;
+    int i;
+    for (i=0; i<msg_p->mode.length(); i++){
+        _msg_2.mode[i] = msg_p->mode[i];
+    }
+    _msg_2.mode[i] = '\0';
+    
 }
 
-void dji_proxy::angVelCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    _msg_1.yaw_rate = msg_p->vector.z;
+void px4_proxy::velCB(const geometry_msgs::TwistStamped::ConstPtr &msg_p){
+    _msg_1.vx = msg_p->twist.linear.x;
+    _msg_1.vy = msg_p->twist.linear.y;
+    _msg_1.vz = msg_p->twist.linear.z;
+    _msg_1.yaw_rate = msg_p->twist.angular.z;
 }
 
-void dji_proxy::altCB(const geometry_msgs::QuaternionStamped::ConstPtr &msg_p){
-    tf::Quaternion quat;
-    tf::quaternionMsgToTF(msg_p->quaternion, quat);
-    double roll, pitch, yaw;
-    tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
-    _msg_1.yaw = yaw;
+void px4_proxy::localPoseCB(const geometry_msgs::PoseStamped::ConstPtr &msg_p){
+    _msg_1.x = msg_p->pose.position.x;
+    _msg_1.y = msg_p->pose.position.y;
+    _msg_1.z = msg_p->pose.position.z;
+    // gei RPY
+    double r,p,y;
+    tf2::getEulerYPR(msg_p->pose.orientation, y, p, r);
+    _msg_1.yaw = y;
+    _msg_1.pitch = p;
+    _msg_1.roll = r;
 }
 
-
-void dji_proxy::batStaSub(const sensor_msgs::BatteryState::ConstPtr &msg_p){
-    _msg_2.battery_v = msg_p->voltage/1000.0;
+void px4_proxy::batStaSub(const mavros_msgs::BatteryStatus::ConstPtr &msg_p){
+    _msg_2.battery_v = msg_p->voltage;
 }
 
-void dji_proxy::disMoCB(const std_msgs::UInt8::ConstPtr &msg_p){
-    _msg_2.display_mode = msg_p->data;
-
-    // TODO msg_1.arm_state
-}
-
-void dji_proxy::fliStaCB(const std_msgs::UInt8::ConstPtr &msg_p){
-    _msg_2.flight_status = msg_p->data;
-
-    // TODO msg_1.arm_state
-}
-
-void dji_proxy::gpsHeaCB(const std_msgs::UInt8::ConstPtr &msg_p){
-    _msg_2.gps_health = msg_p->data;
-}
-
-void dji_proxy::gpsPosCB(const sensor_msgs::NavSatFix::ConstPtr &msg_p){
-    _msg_1.latitude = msg_p->latitude;
-    _msg_1.longitude = msg_p->longitude;
-    _msg_1.altitude = msg_p->altitude;
-}
-
-void dji_proxy::velCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    _msg_1.vx = msg_p->vector.x;
-    _msg_1.vy = msg_p->vector.y;
-    _msg_1.vz = msg_p->vector.z;
-}
-
-void dji_proxy::heightCB(const std_msgs::Float32::ConstPtr &msg_p){
-    _msg_1.height_above_takeoff = msg_p->data;
-}
-
-void dji_proxy::localPosCB(const geometry_msgs::PointStamped::ConstPtr &msg_p){
-    _msg_1.x = msg_p->point.x;
-    _msg_1.y = msg_p->point.y;
-    _msg_1.z = msg_p->point.z;
-}
-
-void dji_proxy::msgCB(const std_msgs::String::ConstPtr &msg_p){
+void px4_proxy::msgCB(const std_msgs::String::ConstPtr &msg_p){
     MSG_255 msg_255;
-    memcpy(msg_255.data, msg_p->data.c_str(), sizeof(msg_255.data));
-    msg_255.data[sizeof(msg_255)-1] = '\0';
+    int len = std::min(sizeof(msg_255), msg_p->data.length());
+    for (int i = 0; i<len; i++){
+        msg_255.data[i] = msg_p->data[i];
+    }
+    len = len ==  sizeof(msg_255) ? len-1: len;  
+    msg_255.data[len] = '\0';
+
     _buffer_write[0] = 0X5A;
     _buffer_write[1] = 255;
     _buffer_write[2] = 254;
@@ -347,15 +316,15 @@ void dji_proxy::msgCB(const std_msgs::String::ConstPtr &msg_p){
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL,"");
-    ros::init(argc,argv,"dji_proxy");
+    ros::init(argc,argv,"px4_proxy");
 
     ros::NodeHandle nh;
     ros::NodeHandle private_nh("~");
 
-    // wait for dji_sdk node setting up
+    // wait for px4_sdk node setting up
     ros::Duration(3).sleep();
 
-    dji::dji_proxy dp;
+    px4::px4_proxy pp;
 
     ros::spin();
 

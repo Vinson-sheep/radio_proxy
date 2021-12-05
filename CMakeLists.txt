@@ -15,8 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   serial
   std_msgs
   tf
+  mavros_msgs
 )
-find_package(DJIOSDK REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -142,7 +142,7 @@ add_library(radio_proxy
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(dji_proxy src/dji_proxy.cpp)
+add_executable(px4_proxy src/px4_proxy.cpp)
 add_executable(station_proxy src/station_proxy.cpp)
 add_executable(debug_node test/debug_node.cpp)
 add_executable(distance_test test/distance_test.cpp)
@@ -156,7 +156,7 @@ add_executable(distance_test test/distance_test.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(radio_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(dji_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(px4_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(station_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(debug_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(distance_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -165,7 +165,7 @@ add_dependencies(distance_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPO
 target_link_libraries(radio_proxy
   ${catkin_LIBRARIES}
 )
-target_link_libraries(dji_proxy
+target_link_libraries(px4_proxy
   ${catkin_LIBRARIES}
 )
 target_link_libraries(station_proxy
