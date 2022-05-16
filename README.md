@@ -1,206 +1,111 @@
-# 使用教程
+# 无人机数传通信代理 2.0
 
-Vinson Sheep
+无人机之间通信通常依赖4G模块或者数传图传。4G模块需要购买SIM卡并长期续费，虽然带宽很高，但是在某些信号弱的地方就很不友好。该项目提供了地面站和多无人机之间利用数传电台通讯的ROS接口，地面站与无人机共享状态和位置信息，开发者无需思考串口通信的具体实现。该项目在**ubuntu 18.04**、**ros melodic**中充分测试，理论上在其他版本的系统中也能正确运行。
 
-2021.10.11
 
-*如果需要添加功能，可以直接联系我，或者issue该项目*
 
-## 1. 总览
+2.0版本与之前的版本完全不兼容，其底层结构完全不一样。新版本相比于旧版本接口更为清晰，功能更为强大，稳定性更好。使用**CUDA XBee Pro 数传电台** 测试发现单结点带宽最多只有5KB/s，这种状态下数传丢包率严重，伴随大量的ERROR输出。为了程序的正确运行，**务必保证单结点的带宽在2KB/s以下** （如果你的数传更为强劲，可以往上调整）。如果你希望将该项目迁移到您的编队项目中，**请务必保证通信过程中不出现任何ERROR输出**。ERROR的打印通常是带宽不足导致的，带宽不足致使缓冲区的旧数据被新数据覆盖，此时需要适当降低信息的发送频率。在默认配置下，**最多支持5台无人机的编队**。
 
-该包提供了地面站和N3/A3飞控无人机之间利用数传电台通讯的ROS接口，这使得地面站能够实时地获取无人机的状态或位置信息，并且发送控制指令，而无需思考串口通信的具体实现。
 
->1. 该包假设地面站和无人机之间的通信是畅通的，不存在链路断开的情况
->
->2. 无人机编号默认从1开始
->
->3. ubuntu 18.04, ros melodic, A3/N3飞控
->
->4. 地面站带宽默认为5KB， 无人机端带宽默认为2KB，如果想增加带宽，请修改源码频率
 
-#### 地面站/无人机 依赖安装
+*开发不易，请star支持一下*
+
+<p style="text-align: center;">
+<img src="./docs/fig/arc.png" alt="XbeePro" width="600px" />
+
+<p style="text-align: center;">
+  <img src="./docs/fig/outdoor_1.png" alt="XbeePro" width="300px" />
+  <img src="./docs/fig/outdoor_2.png" alt="XbeePro" width="300px" />
+<!-- <\p> -->
+
+
+## 1. 特点
+
+- 支持N3、A3、PX4飞控，仅需要少量修改开箱即用；
+- 默认大端通讯，自动检测环境大小端，可移植性强；
+- 提供目标、轨迹、位置共享，全方位支持编队；
+- 支持地面站为中心或无人机为中心的通信拓扑结构；
+
+## 2. 固定串口ID （如果不需要请忽略）
+
+将数传通过USB连接到地面站或者机载电脑上，然后参考[此处](https://blog.csdn.net/sunkman/article/details/118196128)固定串口ID。 开发包中的默认端口号为`/dev/usb_radio`。喜欢用`/dev/ttyUSB0`之类的端口可以修改对应launch文件。
+
+## 3. 安装
+
+假设各位已经配置好了无人机机载电脑的环境：
+
+1. A3上配置 [Onboard-SDK-ROS](https://github.com/dji-sdk/Onboard-SDK-ROS) 最新版（大疆无人机，如M300 RTK）
+2. N3上配置 [Onboard-SDK-ROS 3.8.1](https://github.com/dji-sdk/Onboard-SDK-ROS)（自制无人机或大疆无人机）
+3. PX4上配置 [MAVROS](https://www.baidu.com/link?url=qdfDO4WCHD5HML_o9JCDw2jj6DeOOzgi33U-_QuquMKBr-95cWAkux4cs1_hgOdU&wd=&eqid=eebaf7200006f58b0000000362810e43) 最新版（自制飞机）
+
+#### 依赖安装
 
 ```
 sudo apt install ros-melodic-serial
 ```
 
-该包同样依赖dji_sdk，请务必提前安装好。
-
-#### 固定串口ID （如果不需要请忽略）
-
-[参考地址](https://blog.csdn.net/sunkman/article/details/118196128)
-
-开发包中的默认端口号为`/dev/usb_radio`或者`/dev/usb_n3`。喜欢用`/dev/ttyUSB0`之类的端口可以修改对应launch文件。
-
-#### 地面站：
+#### 新建ROS工作区
 
 ```
-roslaunch radio_proxy station_proxy
+// 新建终端
+mkdir -p catkin_ws/src
+cd catkin_ws
+catkin_make
+cd src
+git clone https://github.com/Vinson-sheep/radio_proxy.git
 ```
 
-#### 无人机：
+#### 编译
 
-修改配置文件
+由于需求不同，编译部分是按需编译。
 
-```
-sudo gedit ~/.bashrc
-```
+**地面站：**
 
-在末尾添加
+打开`~/.bashrc`文件，追加：
 
 ```
-export dji_id=<无人机id>
+export swarm_num=5 # 无人机数目
+export broadcast=true # 如果地面站为通信中心，则负责转发内容
 ```
 
-新建终端
+**无人机：**
+
+打开`~/.bashrc`文件，追加：
 
 ```
-roslaunch radio_proxy dji_proxy
+export vehicle_id=<无人机id> # 无人机ID，从1到swarm_num
+export swarm_num=5 # 无人机数目，用于过滤信息
+export broadcast=false # 如果该无人机为通信中心，则设置为true
+# 话题前缀
+export prefix=mavros # PX4
+export prefix=dji_sdk # N3
+export prefix=dji_osdk_ros # A3
 ```
 
+(共同) 打开`radio_proxy`主目录下的`backup`文件夹，根据需求将里面的内容覆盖`radio_proxy`根目录下`CMakeLists.txt`和`src`目录下的`AIR_proxy_node.cpp`。其中，GS表示`Ground Station`。回到`catkin_ws`目录下，使用`catkin_make`编译即可。
 
+## 4. 运行
 
-## 2. 结点
+新建一个终端：
 
-### 2.1 station_proxy
+**地面站：**
 
-地面站通信代理
+```
+roslaunch radio_proxy GS_proxy.launch
+```
 
-#### 2.1.1 Subscribed Topics
+**无人机：**
 
-**/station_proxy/command (radio_proxy/Command)**
+```
+roslaunch radio_proxy AIR_proxy.launch
+```
 
-| 命令           | 数值 | 描述          |
-| -------------- | ---- | ------------- |
-| SETPOINT_GPS   | 101  | GPS定点飞行   |
-| SETPOINT_LOCAL | 102  | LOCAL定点飞行 |
-| TAKEOFF        | 103  | 起飞          |
-| LAND           | 104  | 降落          |
-| ARM            | 105  | 解锁          |
-| DISARM         | 106  | 上锁          |
-| HOLD           | 107  | 悬停          |
+尝试打印`topic`观察数据是否正常。
 
-#### 2.1.2 Published Topics
+## 5. 问题
 
-**/dji_{id}/status (radio_proxy/Status)**
-
-用于描述第id架飞机的状态。
-
-**/dji_{id}/flight_data (radio_proxy/FlightData)**
-
-用于描述第id架飞机的飞行数据。
-
-**/dji_{id}/message (std_msg/String)**
-
-第id架飞机回传回来的消息。
-
-#### 2.1.3 Services
-
-#### 2.1.4 Services used
-
-#### 2.1.5 Parameters
-
-**~/station_proxy/uav_num (int, default: 1)**
-
-飞机数目，默认为1台，最多支持8台设备。
-
-**~/station_proxy/serial_port (string, default: /dev/ttyUSB0)**
-
-串口地址，可以在/dev目录下查询。
-
-**~/station_proxy/baud_rate (int, default: 230400)**
-
-波特率，与数传电台自身配置有关。
-
-
-
-### 2.2 dji_proxy
-
-无人机通信代理
-
-#### 2.2.1 Subscribed Topics
-
-1. dji_sdk接口 [官网地址](http://wiki.ros.org/dji_sdk/)
-
-**/dji_sdk/acceleration_ground_fused ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
-
-Fused acceleration with respect to East-North-Up (ENU) ground frame, published at 100 Hz. This topic is unavailable on M100. Use imu topic for raw acceleration.
-
-**/dji_sdk/angular_velocity_fused ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
-
-Fused angular rate (p,q,r) around Forward-Left-Up (FLU) body frame, published at 100 Hz. This topic is unavailable on M100. Use imu topic for raw rate.
-
-**/dji_sdk/attitude ([geometry_msgs/QuaternionStamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/QuaternionStamped.html)) **
-
-Vehicle attitude represented as quaternion for the rotation from FLU body frame to ENU ground frame, published at 100 Hz. 
-
-**/dji_sdk/battery_state ([sensor_msgs/BatteryState](http://docs.ros.org/en/api/sensor_msgs/html/msg/BatteryState.html)) **
-
-Report the current battery voltage at 10 Hz.
-
-**/dji_sdk/display_mode ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
-
-Display mode is the detailed status of the drone. All supported status are listed in dji_sdk.h. Published at 50 Hz. This topic is unavailable on M100. 
-
-**/dji_sdk/flight_status ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
-
-Simple status of the vehicle published at 50 Hz, detailed status are  listed in dji_sdk.h. Note that status for M100 and A3/N3 are different. 
-
-**/dji_sdk/gps_health ([std_msgs/UInt8](http://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html)) **
-
-GPS signal health is between 0 and 5, 5 is the best condition. Use  gps_position for control only if gps_health >= 3. Published at 50 Hz. 
-
-**/dji_sdk/gps_position ([sensor_msgs/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)) **
-
-Fused global position of the vehicle in latitude, longitude and  altitude(m). Position in WGS 84 reference ellipsoid, published at 50 Hz. If no gps present, default publishes longitude and latitude equal  zeros. 
-
-**/dji_sdk/velocity ([geometry_msgs/Vector3Stamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3Stamped.html)) **
-
-Velocity in ENU ground frame, published at 50 Hz. The velocity is valid only when gps_health >= 3. 
-
-**/dji_sdk/height_above_takeoff ([std_msgs/Float32](http://docs.ros.org/en/api/std_msgs/html/msg/Float32.html)) **
-
-Height above takeoff location. It is only valid after drone is armed, when the flight controller has a reference altitude set. 
-
-**/dji_sdk/local_position ([geometry_msgs/PointStamped](http://docs.ros.org/en/api/geometry_msgs/html/msg/PointStamped.html)) **
-
-Local position in Cartesian ENU frame, of which the origin is set by the user by calling the /dji_sdk/set_local_pos_ref service. Note that the  local position is calculated from GPS position, so good GPS health is needed for the local position to be useful. 
-
-2. 结点接口
-
-**/dji_proxy/message (std_msg/String)**
-
-回传的消息，用于地面站打印。无需编写类`dji_1:`开头，地面站会针对不同的飞机提供不同的`topic`。为了代码的正常使用，请不要过分依赖该接口，务必作为偶然的信息回传接口。
-
-
-
-#### 2.2.2 Published Topics
-
-**/dji_proxy/leader/flight_data (radio_proxy/FlightData)**
-
-如果id为1，代表本机为leader，不会发送该消息。只有从机才能收到该话题。（debug情况下leader同样会收到）
-
-**/dji_proxy/command (radio_proxy/Command)**
-
-来自地面站的命令信息。详情可见2.1.1。
-
-#### 2.2.3 Services
-
-#### 2.2.4 Services used
-
-#### 2.2.5 Parameters
-
-**~/dji_proxy/id (int, default: 1)**
-
-无人机ID，从1开始编号。
-
-**~/dji_proxy/serial_port (string, default: /dev/ttyUSB0)**
-
-串口地址，可以在/dev目录下查询。
-
-**~/dji_proxy/baud_rate (int, default: 230400)**
-
-波特率，与数传电台自身配置有关。
+1. **2.x.x**版本均提供相同的接口，且本项目长期处于活跃状态，如果发现通信双方异常则可以重新Pull一下代码；
+2. 高速集群编队需要高刷新率的信息共享，此时可以适当调节`uav_proxy.cpp`中`resendFlightDataTimer`和`resendStatusTimer`的回传频率（保证单结点的单宽小于2KB/s）；
 
 
 

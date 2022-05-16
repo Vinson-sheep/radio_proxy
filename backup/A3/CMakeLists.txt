@@ -15,9 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   serial
   std_msgs
   tf
-  # dji_osdk_ros
+  dji_osdk_ros
 )
-find_package(DJIOSDK REQUIRED)
+# find_package(DJIOSDK REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -182,27 +182,27 @@ target_link_libraries(A3_proxy
   N3_proxy
 )
 
-# PX4 autopilot
-add_library(PX4_proxy 
-  include/radio_proxy/PX4_proxy.h
-  src/PX4_proxy.cpp
-)
-add_dependencies(PX4_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(PX4_proxy
-  ${catkin_LIBRARIES}
-  uav_proxy
-)
+# # PX4 autopilot
+# add_library(PX4_proxy 
+#   include/radio_proxy/PX4_proxy.h
+#   src/PX4_proxy.cpp
+# )
+# add_dependencies(PX4_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(PX4_proxy
+#   ${catkin_LIBRARIES}
+#   uav_proxy
+# )
 
 # Ground station
-add_library(GS_proxy 
-  include/radio_proxy/GS_proxy.h
-  src/GS_proxy.cpp
-)
-add_dependencies(GS_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(GS_proxy
-  ${catkin_LIBRARIES}
-  base_proxy
-)
+# add_library(GS_proxy 
+#   include/radio_proxy/GS_proxy.h
+#   src/GS_proxy.cpp
+# )
+# add_dependencies(GS_proxy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(GS_proxy
+#   ${catkin_LIBRARIES}
+#   base_proxy
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -214,12 +214,12 @@ target_link_libraries(GS_proxy
 ## The recommended prefix ensures that target names across packages don't collide
 
 
-add_executable(GS_proxy_node src/GS_proxy_node.cpp)
-add_dependencies(GS_proxy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(GS_proxy_node
-${catkin_LIBRARIES}
-GS_proxy
-)
+# add_executable(GS_proxy_node src/GS_proxy_node.cpp)
+# add_dependencies(GS_proxy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(GS_proxy_node
+# ${catkin_LIBRARIES}
+# GS_proxy
+# )
 
 add_executable(AIR_proxy_node src/AIR_proxy_node.cpp)
 add_dependencies(AIR_proxy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -227,14 +227,14 @@ target_link_libraries(AIR_proxy_node
 ${catkin_LIBRARIES}
 N3_proxy
 A3_proxy
-PX4_proxy
+# PX4_proxy
 )
 
-add_executable(test_node test/test.cpp)
-add_dependencies(test_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(test_node
-${catkin_LIBRARIES}
-)
+# add_executable(test_node test/test.cpp)
+# add_dependencies(test_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(test_node
+# ${catkin_LIBRARIES}
+# )
 
 
 ## Rename C++ executable without prefix

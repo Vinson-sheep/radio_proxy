@@ -1,0 +1,15 @@
+<launch>
+    <arg name="id" default="$(env vehicle_id)" doc="id type [1, 2, 3]"/>
+    <arg name="swarm_num" default="$(env swarm_num)" doc="swarm_num type [1, 2, 3]"/>
+    <arg name="broadcast" default="$(env broadcast)" doc="broadcast type [true, false]"/>
+    <arg name="prefix" default="$(env prefix)" doc="prefix type [mavros, dji_sdk, dji_osdk_ros]"/>
+
+    <node pkg="radio_proxy" type="AIR_proxy_node" name="AIR_proxy" output="screen">
+        <param name="id" value="$(arg id)"/>
+        <param name="port" value="/dev/usb_radio" />
+        <param name="baud_rate" value="230400" />
+        <param name="swarm_num" value="$(arg swarm_num)" />
+        <param name="broadcast" value="$(arg broadcast)" />
+        <param name="prefix" value="$(arg prefix)" />
+    </node>
+</launch>

@@ -1,9 +1,0 @@
-<launch>
-    <arg name="id" default="$(env dji_id)" doc="uav_id type [1, 2, 3]"/>
-
-    <node pkg="radio_proxy" type="dji_proxy" name="dji_proxy" output="screen">
-        <param name="id" value="$(arg id)"/>
-        <param name="port" value="/dev/usb_radio" />
-        <param name="baud_rate" value="230400" />
-    </node>
-</launch>

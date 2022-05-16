@@ -6,22 +6,19 @@ uint8 id # 255 for all
 float64 latitude
 float64 longitude
 float64 altitude
-# local
-float64 x
-float64 y
-float64 z
 
-float64 vx
-float64 vy
-float64 vz
+float64 latitude_rtk
+float64 longitude_rtk
+float64 altitude_rtk
 
-float64 ax
-float64 ay
-float64 az
+geometry_msgs/Vector3 position_local
+geometry_msgs/Vector3 position_local_rtk
+geometry_msgs/Vector3 velocity_local
+geometry_msgs/Vector3 velocity_local_rtk
+geometry_msgs/Vector3 accel_local
+geometry_msgs/Vector3 rpy
+geometry_msgs/Vector3 gimbal_angular
 
-float64 pitch
-float64 roll
-float64 yaw
 float64 yaw_rate
 
 # valid when gps health >= 3
