@@ -19,6 +19,14 @@
 <!-- <\p> -->
 
 
+[【无人机通信】radio_proxy配置教程--地面站](https://www.bilibili.com/video/BV1X3411A7qd?spm_id_from=333.999.0.0)
+
+[【无人机通信】radio_proxy配置教程--A3](https://www.bilibili.com/video/BV1kT4y1z7K3?spm_id_from=333.999.0.0)
+
+[【无人机通信】radio_proxy配置教程--N3](https://www.bilibili.com/video/BV1R54y1Z7KQ?spm_id_from=333.999.0.0)
+
+
+
 ## 1. 特点
 
 - 支持N3、A3、PX4飞控，仅需要少量修改开箱即用；

@@ -5,8 +5,8 @@
 
     <node pkg="radio_proxy" type="GS_proxy_node" name="GS_proxy" output="screen">
         <param name="id" value="$(arg id)"/>
-        <!-- <param name="port" value="/dev/usb_radio" /> -->
-        <param name="port" value="/dev/ttyUSB0" />
+        <param name="port" value="/dev/usb_radio" />
+        <!-- <param name="port" value="/dev/ttyUSB0" /> -->
         <param name="baud_rate" value="230400" />
         <param name="swarm_num" value="$(arg swarm_num)" />
         <param name="broadcast" value="$(arg broadcast)" />
