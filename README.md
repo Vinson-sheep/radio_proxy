@@ -25,13 +25,15 @@
 
 [【无人机通信】radio_proxy配置教程--N3](https://www.bilibili.com/video/BV1R54y1Z7KQ?spm_id_from=333.999.0.0)
 
+[【其他教程】XbeePro 配置教程](https://github.com/Vinson-sheep/radio_proxy/blob/2.0/docs/XBeePro_config.pdf)
+
 
 
 ## 1. 特点
 
 - 支持N3、A3、PX4飞控，仅需要少量修改开箱即用；
 - 默认大端通讯，自动检测环境大小端，可移植性强；
-- 提供目标、轨迹、位置共享，全方位支持编队；
+- 提供目标、位置共享，全方位支持编队；
 - 支持地面站为中心或无人机为中心的通信拓扑结构；
 
 ## 2. 固定串口ID （如果不需要请忽略）
@@ -114,6 +116,7 @@ roslaunch radio_proxy AIR_proxy.launch
 
 1. **2.x.x**版本均提供相同的接口，且本项目长期处于活跃状态，如果发现通信双方异常则可以重新Pull一下代码；
 2. 高速集群编队需要高刷新率的信息共享，此时可以适当调节`uav_proxy.cpp`中`resendFlightDataTimer`和`resendStatusTimer`的回传频率（保证单结点的单宽小于2KB/s）；
+3. 轨迹共享的支持曾经被实现，遗憾的是，数传电台的带宽很难支撑该功能，最后不得不放弃；
 
 
 
