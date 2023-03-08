@@ -234,35 +234,35 @@ void base_proxy::MSGCB(const MSG_1& msg, uint8_t o_target_id, uint8_t o_local_id
         msg_pub.longitude_rtk = msg.longitude_rtk;
         msg_pub.altitude_rtk = msg.altitude_rtk;
 
-        msg_pub.position_local.x = msg.position_local.x;
-        msg_pub.position_local.y = msg.position_local.y;
-        msg_pub.position_local.z = msg.position_local.z;
+        // msg_pub.position_local.x = msg.position_local.x;
+        // msg_pub.position_local.y = msg.position_local.y;
+        // msg_pub.position_local.z = msg.position_local.z;
 
-        msg_pub.position_local_rtk.x = msg.position_local_rtk.x;
-        msg_pub.position_local_rtk.y = msg.position_local_rtk.y;
-        msg_pub.position_local_rtk.z = msg.position_local_rtk.z;
+        // msg_pub.position_local_rtk.x = msg.position_local_rtk.x;
+        // msg_pub.position_local_rtk.y = msg.position_local_rtk.y;
+        // msg_pub.position_local_rtk.z = msg.position_local_rtk.z;
 
-        msg_pub.velocity_local.x = msg.velocity_local.x;
-        msg_pub.velocity_local.y = msg.velocity_local.y;
-        msg_pub.velocity_local.z = msg.velocity_local.z;
+        // msg_pub.velocity_local.x = msg.velocity_local.x;
+        // msg_pub.velocity_local.y = msg.velocity_local.y;
+        // msg_pub.velocity_local.z = msg.velocity_local.z;
 
-        msg_pub.velocity_local_rtk.x = msg.velocity_local_rtk.x;
-        msg_pub.velocity_local_rtk.y = msg.velocity_local_rtk.y;
-        msg_pub.velocity_local_rtk.z = msg.velocity_local_rtk.z;
+        // msg_pub.velocity_local_rtk.x = msg.velocity_local_rtk.x;
+        // msg_pub.velocity_local_rtk.y = msg.velocity_local_rtk.y;
+        // msg_pub.velocity_local_rtk.z = msg.velocity_local_rtk.z;
 
-        msg_pub.accel_local.x = msg.accel_local.x;
-        msg_pub.accel_local.y = msg.accel_local.y;
-        msg_pub.accel_local.z = msg.accel_local.z;
+        // msg_pub.accel_local.x = msg.accel_local.x;
+        // msg_pub.accel_local.y = msg.accel_local.y;
+        // msg_pub.accel_local.z = msg.accel_local.z;
 
-        msg_pub.rpy.x = msg.rpy.x;
-        msg_pub.rpy.y = msg.rpy.y;
-        msg_pub.rpy.z = msg.rpy.z;
+        // msg_pub.rpy.x = msg.rpy.x;
+        // msg_pub.rpy.y = msg.rpy.y;
+        // msg_pub.rpy.z = msg.rpy.z;
 
-        msg_pub.gimbal_angular.x = msg.gimbal_angular.x;
-        msg_pub.gimbal_angular.y = msg.gimbal_angular.y;
-        msg_pub.gimbal_angular.z = msg.gimbal_angular.z;
+        // msg_pub.gimbal_angular.x = msg.gimbal_angular.x;
+        // msg_pub.gimbal_angular.y = msg.gimbal_angular.y;
+        // msg_pub.gimbal_angular.z = msg.gimbal_angular.z;
 
-        msg_pub.yaw_rate = msg.yaw_rate;    
+        // msg_pub.yaw_rate = msg.yaw_rate;    
         msg_pub.height_above_takeoff = msg.height_above_takeoff;
 
         fdPub.publish(msg_pub);

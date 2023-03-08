@@ -61,7 +61,7 @@ public:
 ///飞行数据：广播无人机的高频信息
 typedef struct MSG_1: public MSG{
 
-    const size_t n = 116;
+    const size_t n = 28;
 
     float_t latitude;
     float_t longitude;
@@ -71,30 +71,31 @@ typedef struct MSG_1: public MSG{
     float_t longitude_rtk;
     float_t altitude_rtk;
 
-    v3f position_local;
-    v3f position_local_rtk;
+    // v3f position_local;
+    // v3f position_local_rtk;
 
-    v3f velocity_local;
-    v3f velocity_local_rtk;
+    // v3f velocity_local;
+    // v3f velocity_local_rtk;
 
-    v3f accel_local;
-    v3f rpy;
-    v3f gimbal_angular;
+    // v3f accel_local;
+    // v3f rpy;
+    // v3f gimbal_angular;
 
-    float_t yaw_rate = 0;
+    // float_t yaw_rate = 0;
     float_t height_above_takeoff = 0;
     
     MSG_1(){
         latitude = longitude = altitude = 0;
         latitude_rtk = longitude_rtk = altitude_rtk = 0;
-        position_local.x = position_local.y = position_local.z = 0;
-        position_local_rtk.x = position_local_rtk.y = position_local_rtk.z = 0;
-        velocity_local.x = velocity_local.y = velocity_local.z = 0;
-        velocity_local_rtk.x = velocity_local_rtk.y = velocity_local_rtk.z = 0;
-        accel_local.x = accel_local.y = accel_local.z = 0;
-        rpy.x = rpy.y = rpy.z = 0;
-        gimbal_angular.x = gimbal_angular.y = gimbal_angular.z = 0;
-        yaw_rate = height_above_takeoff = 0;
+        // position_local.x = position_local.y = position_local.z = 0;
+        // position_local_rtk.x = position_local_rtk.y = position_local_rtk.z = 0;
+        // velocity_local.x = velocity_local.y = velocity_local.z = 0;
+        // velocity_local_rtk.x = velocity_local_rtk.y = velocity_local_rtk.z = 0;
+        // accel_local.x = accel_local.y = accel_local.z = 0;
+        // rpy.x = rpy.y = rpy.z = 0;
+        // gimbal_angular.x = gimbal_angular.y = gimbal_angular.z = 0;
+        // yaw_rate = height_above_takeoff = 0;
+        height_above_takeoff = 0;
     }
     ~MSG_1(){}
 
@@ -112,35 +113,35 @@ typedef struct MSG_1: public MSG{
         longitude_rtk = stof(str.substr(pos, 4), pos);
         altitude_rtk = stof(str.substr(pos, 4), pos);
         
-        position_local.x = stof(str.substr(pos, 4), pos);
-        position_local.y = stof(str.substr(pos, 4), pos);
-        position_local.z = stof(str.substr(pos, 4), pos);
+        // position_local.x = stof(str.substr(pos, 4), pos);
+        // position_local.y = stof(str.substr(pos, 4), pos);
+        // position_local.z = stof(str.substr(pos, 4), pos);
 
-        position_local_rtk.x = stof(str.substr(pos, 4), pos);
-        position_local_rtk.y = stof(str.substr(pos, 4), pos);
-        position_local_rtk.z = stof(str.substr(pos, 4), pos);
+        // position_local_rtk.x = stof(str.substr(pos, 4), pos);
+        // position_local_rtk.y = stof(str.substr(pos, 4), pos);
+        // position_local_rtk.z = stof(str.substr(pos, 4), pos);
 
-        velocity_local.x = stof(str.substr(pos, 4), pos);
-        velocity_local.y = stof(str.substr(pos, 4), pos);
-        velocity_local.z = stof(str.substr(pos, 4), pos);
+        // velocity_local.x = stof(str.substr(pos, 4), pos);
+        // velocity_local.y = stof(str.substr(pos, 4), pos);
+        // velocity_local.z = stof(str.substr(pos, 4), pos);
 
-        velocity_local_rtk.x = stof(str.substr(pos, 4), pos);
-        velocity_local_rtk.y = stof(str.substr(pos, 4), pos);
-        velocity_local_rtk.z = stof(str.substr(pos, 4), pos);
+        // velocity_local_rtk.x = stof(str.substr(pos, 4), pos);
+        // velocity_local_rtk.y = stof(str.substr(pos, 4), pos);
+        // velocity_local_rtk.z = stof(str.substr(pos, 4), pos);
 
-        accel_local.x = stof(str.substr(pos, 4), pos);
-        accel_local.y = stof(str.substr(pos, 4), pos);
-        accel_local.z = stof(str.substr(pos, 4), pos);
+        // accel_local.x = stof(str.substr(pos, 4), pos);
+        // accel_local.y = stof(str.substr(pos, 4), pos);
+        // accel_local.z = stof(str.substr(pos, 4), pos);
 
-        rpy.x = stof(str.substr(pos, 4), pos);
-        rpy.y = stof(str.substr(pos, 4), pos);
-        rpy.z = stof(str.substr(pos, 4), pos);
+        // rpy.x = stof(str.substr(pos, 4), pos);
+        // rpy.y = stof(str.substr(pos, 4), pos);
+        // rpy.z = stof(str.substr(pos, 4), pos);
 
-        gimbal_angular.x = stof(str.substr(pos, 4), pos);
-        gimbal_angular.y = stof(str.substr(pos, 4), pos);
-        gimbal_angular.z = stof(str.substr(pos, 4), pos);    
+        // gimbal_angular.x = stof(str.substr(pos, 4), pos);
+        // gimbal_angular.y = stof(str.substr(pos, 4), pos);
+        // gimbal_angular.z = stof(str.substr(pos, 4), pos);    
 
-        yaw_rate = stof(str.substr(pos, 4), pos);
+        // yaw_rate = stof(str.substr(pos, 4), pos);
         height_above_takeoff = stof(str.substr(pos, 4), pos);
 
         return true;
@@ -158,35 +159,35 @@ typedef struct MSG_1: public MSG{
         res += toStr(longitude_rtk);
         res += toStr(altitude_rtk);
 
-        res += toStr(position_local.x);
-        res += toStr(position_local.y);
-        res += toStr(position_local.z);
+        // res += toStr(position_local.x);
+        // res += toStr(position_local.y);
+        // res += toStr(position_local.z);
 
-        res += toStr(position_local_rtk.x);
-        res += toStr(position_local_rtk.y);
-        res += toStr(position_local_rtk.z);
+        // res += toStr(position_local_rtk.x);
+        // res += toStr(position_local_rtk.y);
+        // res += toStr(position_local_rtk.z);
 
-        res += toStr(velocity_local.x);
-        res += toStr(velocity_local.y);
-        res += toStr(velocity_local.z);
+        // res += toStr(velocity_local.x);
+        // res += toStr(velocity_local.y);
+        // res += toStr(velocity_local.z);
 
-        res += toStr(velocity_local_rtk.x);
-        res += toStr(velocity_local_rtk.y);
-        res += toStr(velocity_local_rtk.z);
+        // res += toStr(velocity_local_rtk.x);
+        // res += toStr(velocity_local_rtk.y);
+        // res += toStr(velocity_local_rtk.z);
 
-        res += toStr(accel_local.x);
-        res += toStr(accel_local.y);
-        res += toStr(accel_local.z);
+        // res += toStr(accel_local.x);
+        // res += toStr(accel_local.y);
+        // res += toStr(accel_local.z);
 
-        res += toStr(rpy.x);
-        res += toStr(rpy.y);
-        res += toStr(rpy.z);
+        // res += toStr(rpy.x);
+        // res += toStr(rpy.y);
+        // res += toStr(rpy.z);
 
-        res += toStr(gimbal_angular.x);
-        res += toStr(gimbal_angular.y);
-        res += toStr(gimbal_angular.z);
+        // res += toStr(gimbal_angular.x);
+        // res += toStr(gimbal_angular.y);
+        // res += toStr(gimbal_angular.z);
 
-        res += toStr(yaw_rate);
+        // res += toStr(yaw_rate);
         res += toStr(height_above_takeoff);
 
         return res;

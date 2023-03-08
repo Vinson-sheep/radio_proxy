@@ -26,9 +26,9 @@ void A3_proxy::rtkPosCB(const sensor_msgs::NavSatFix::ConstPtr &msg_p){
     msg_1_m.altitude_rtk = msg_p->altitude;
 }
 void A3_proxy::rtkVelCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    msg_1_m.velocity_local_rtk.x = msg_p->vector.x;
-    msg_1_m.velocity_local_rtk.y = msg_p->vector.y;
-    msg_1_m.velocity_local_rtk.z = msg_p->vector.z;
+    // msg_1_m.velocity_local_rtk.x = msg_p->vector.x;
+    // msg_1_m.velocity_local_rtk.y = msg_p->vector.y;
+    // msg_1_m.velocity_local_rtk.z = msg_p->vector.z;
 }
 
 }

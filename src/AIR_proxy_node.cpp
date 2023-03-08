@@ -7,8 +7,8 @@
 ///@copyright Copyright (c) 2022
 ///
 
-#include "radio_proxy/A3_proxy.h"
-// #include "radio_proxy/N3_proxy.h"
+// #include "radio_proxy/A3_proxy.h"
+#include "radio_proxy/N3_proxy.h"
 // #include "radio_proxy/PX4_proxy.h"
 
 int main(int argc, char *argv[])
@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
     ros::Duration(3).sleep();
 
     
-    radio_proxy::A3_proxy dp;
-    // radio_proxy::N3_proxy dp;
+    // radio_proxy::A3_proxy dp;
+    radio_proxy::N3_proxy dp;
     // radio_proxy::PX4_proxy dp;
 
     ros::spin();

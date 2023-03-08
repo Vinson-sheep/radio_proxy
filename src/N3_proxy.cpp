@@ -28,22 +28,22 @@ N3_proxy::~N3_proxy(){
 }
 
 void N3_proxy::accCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    msg_1_m.accel_local.x = msg_p->vector.x;
-    msg_1_m.accel_local.y = msg_p->vector.y;
-    msg_1_m.accel_local.z = msg_p->vector.z;
+    // msg_1_m.accel_local.x = msg_p->vector.x;
+    // msg_1_m.accel_local.y = msg_p->vector.y;
+    // msg_1_m.accel_local.z = msg_p->vector.z;
 }
 
 void N3_proxy::angVelCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    msg_1_m.yaw_rate = msg_p->vector.z;
+    // msg_1_m.yaw_rate = msg_p->vector.z;
 }
 void N3_proxy::altCB(const geometry_msgs::QuaternionStamped::ConstPtr &msg_p){
-    tf::Quaternion quat;
-    tf::quaternionMsgToTF(msg_p->quaternion, quat);
-    double roll, pitch, yaw;
-    tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
-    msg_1_m.rpy.x = roll;
-    msg_1_m.rpy.y = pitch;
-    msg_1_m.rpy.z = yaw;
+    // tf::Quaternion quat;
+    // tf::quaternionMsgToTF(msg_p->quaternion, quat);
+    // double roll, pitch, yaw;
+    // tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+    // msg_1_m.rpy.x = roll;
+    // msg_1_m.rpy.y = pitch;
+    // msg_1_m.rpy.z = yaw;
 
 }
 void N3_proxy::batStaCB(const sensor_msgs::BatteryState::ConstPtr &msg_p){
@@ -70,22 +70,22 @@ void N3_proxy::gpsPosCB(const sensor_msgs::NavSatFix::ConstPtr &msg_p){
     msg_1_m.altitude = msg_p->altitude;
 }
 void N3_proxy::velCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    msg_1_m.velocity_local.x = msg_p->vector.x;
-    msg_1_m.velocity_local.y = msg_p->vector.y;
-    msg_1_m.velocity_local.z = msg_p->vector.z;
+    // msg_1_m.velocity_local.x = msg_p->vector.x;
+    // msg_1_m.velocity_local.y = msg_p->vector.y;
+    // msg_1_m.velocity_local.z = msg_p->vector.z;
 }
 void N3_proxy::heightCB(const std_msgs::Float32::ConstPtr &msg_p){
     msg_1_m.height_above_takeoff = msg_p->data;
 }
 void N3_proxy::localPosCB(const geometry_msgs::PointStamped::ConstPtr &msg_p){
-    msg_1_m.position_local.x = msg_p->point.x;
-    msg_1_m.position_local.y = msg_p->point.y;
-    msg_1_m.position_local.z = msg_p->point.z;
+    // msg_1_m.position_local.x = msg_p->point.x;
+    // msg_1_m.position_local.y = msg_p->point.y;
+    // msg_1_m.position_local.z = msg_p->point.z;
 }
 void N3_proxy::gimbalAngCB(const geometry_msgs::Vector3Stamped::ConstPtr &msg_p){
-    msg_1_m.gimbal_angular.x = msg_p->vector.x;
-    msg_1_m.gimbal_angular.y = msg_p->vector.y;
-    msg_1_m.gimbal_angular.z = msg_p->vector.z;
+    // msg_1_m.gimbal_angular.x = msg_p->vector.x;
+    // msg_1_m.gimbal_angular.y = msg_p->vector.y;
+    // msg_1_m.gimbal_angular.z = msg_p->vector.z;
 }
 
 }
